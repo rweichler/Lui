@@ -1,5 +1,7 @@
 *.out
 *.o
 *.so
+.last
+*.a
 include/lua/lua
 include/lua/luac

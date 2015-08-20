@@ -14,6 +14,8 @@ local objc_msgSend = C.objc.msgSend
 
 local R = {}
 
+R.sel_getUid = sel_getUid
+
 local function id_index(self, key)
     local result = {}
     setmetatable(result, {
@@ -68,6 +70,13 @@ local function format_class(str)
 end
 
 R.framework = function(prefix, dylib)
+    local ok, lib = pcall(C.dlopen, "/System/Library/Frameworks/"..dylib..".framework/"..dylib)
+    if not ok then
+        local ok, lib = pcall(C.dlopen, "/System/Library/PrivateFrameworks/"..dylib..".framework/"..dylib)
+        if not ok then
+            error("framework '"..dylib.."' not found")
+        end
+    end
     --TODO implement dylib
     local result = {}
     setmetatable(result, {

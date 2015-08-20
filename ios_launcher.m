@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <lua/lua.h>
+#import <lua/lualib.h>
 #import <lua/lauxlib.h>
 
 @interface LUIAppDelegate : UIResponder<UIApplicationDelegate>
@@ -22,7 +23,7 @@ int main(int argc, char *argv[])
 {
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
-    lua_dofile(L, file);
+    luaL_dofile(L, file);
     return true;
 }
 @end

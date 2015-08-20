@@ -69,6 +69,29 @@ int l_objc_getMethod(lua_State *L)
     return 1;
 }
 
+int l_objc_getTypesFromMethod(lua_State *L)
+{
+    if(lua_gettop(L) == 0 || !lua_islightuserdata(L, 1)) {
+        return luaL_error(L, "invalid arguments");
+    }
+    Method m = lua_touserdata(L, 1);
+
+    char ret[BUFSIZ];
+    method_getReturnType(m, ret, BUFSIZ);
+    lua_pushstring(L, ret);
+#if 0
+    lua_newtable(L);
+    int count = method_getNumberOfArguments(m);
+    for(int i = 0; i < count; i++) {
+        char arg[BUFSIZ];
+        method_getArgumentType(m, i, arg, BUFSIZ);
+        lua_pushstring(L, arg);
+        lua_rawseti(L, -2, i + 1);
+    }
+#endif
+    return 1;
+}
+
 int l_objc_msgSend(lua_State *L)
 {
     Method m;
@@ -160,6 +183,22 @@ int l_get_symbol(lua_State *L)
     return 1;
 }
 
+int l_open_library(lua_State *L)
+{
+    if(!lua_isstring(L, 1)) {
+        return luaL_error(L, "argument must be a string");
+    }
+    const char *name = lua_tostring(L, 1);
+    void *lib = dlopen(name, RTLD_NOW);
+    if(lib == NULL) {
+        return luaL_error(L, "library "LUA_QL("%s")" not found", name);
+    }
+
+    lua_pushlightuserdata(L, lib);
+
+    return 1;
+}
+
 int l_convert_ptr2string(lua_State *L)
 {
     lua_pushstring(L, lua_touserdata(L, 1));
@@ -172,6 +211,10 @@ int luaopen_bindings(lua_State *L)
 
         lua_pushstring(L, "dlsym");
         lua_pushcfunction(L, l_get_symbol);
+        lua_settable(L, -3);
+
+        lua_pushstring(L, "dlopen");
+        lua_pushcfunction(L, l_open_library);
         lua_settable(L, -3);
 
         lua_pushstring(L, "call");
@@ -207,6 +250,10 @@ int luaopen_bindings(lua_State *L)
 
             lua_pushstring(L, "getMethod");
             lua_pushcfunction(L, l_objc_getMethod);
+            lua_settable(L, -3);
+
+            lua_pushstring(L, "getTypesFromMethod");
+            lua_pushcfunction(L, l_objc_getTypesFromMethod);
             lua_settable(L, -3);
         lua_settable(L, -3);
 
