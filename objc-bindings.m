@@ -79,17 +79,14 @@ int l_objc_getTypesFromMethod(lua_State *L)
     char ret[BUFSIZ];
     method_getReturnType(m, ret, BUFSIZ);
     lua_pushstring(L, ret);
-#if 0
-    lua_newtable(L);
-    int count = method_getNumberOfArguments(m);
+
+    int count =method_getNumberOfArguments(m);
     for(int i = 0; i < count; i++) {
         char arg[BUFSIZ];
         method_getArgumentType(m, i, arg, BUFSIZ);
         lua_pushstring(L, arg);
-        lua_rawseti(L, -2, i + 1);
     }
-#endif
-    return 1;
+    return 1 + count;
 }
 
 int l_objc_msgSend(lua_State *L)

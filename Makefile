@@ -24,3 +24,6 @@ $(BIN): $(NAME).m
 
 $(IOS): ios_launcher.m
 	gcc -o $@ $< -framework Foundation -framework UIKit $(ARCH) -isysroot ~/code/iPhoneOS8.1.sdk -Iinclude include/lua/liblua.a
+
+install: $(OUT)
+	scp $(BIN) 5s:luikit
