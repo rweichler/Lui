@@ -1,0 +1,3 @@
+[submodule "include/lua"]
+	path = include/lua
+	url = git@github.com:rweichler/lua.git
