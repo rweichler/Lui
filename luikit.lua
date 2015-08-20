@@ -32,7 +32,7 @@ local function id_index(self, key)
             newargs[2] = sel_getUid(newargs[2])
             if C.objc.getMethod(newargs[1], newargs[2]) then
                 local result = {}
-                result.__id = objc_msgSend(unpack(newargs))
+                result.__id = objc_msgSend(table.unpack(newargs))
                 setmetatable(result, {
                     __index = id_index
                 })

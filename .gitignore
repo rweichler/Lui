@@ -1,2 +1,5 @@
 *.out
+*.o
 *.so
+include/lua/lua
+include/lua/luac

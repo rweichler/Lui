@@ -1,6 +1,6 @@
 #import <dlfcn.h>
-#import <lua5.2/lua.h>
-#import <lua5.2/lauxlib.h>
+#import <lua/lua.h>
+#import <lua/lauxlib.h>
 #import <stdio.h>
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
