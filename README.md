@@ -4,3 +4,5 @@
 * This is **NOT** for vanilla iOS development. Make it cross platform. Now that [WinObjC](http://github.com/microsoft/WinObjC) is under development we need not worry about UIKit becoming abandoned.
 * Do not use C or Objective C unless you absolutely *have* to. Only reserved for the most low-level bindings.
 * Add easy hooking support for [substitute](http://github.com/comex/substitute) plugins
+
+![](https://github.com/rweichler/LuIKit/raw/master/screen.png)
