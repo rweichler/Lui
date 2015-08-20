@@ -1,5 +1,6 @@
+#!/usr/bin/env lua
 
-
+local C = require 'luikit'
 
 local function make_func(symbol, func)
     return function(arg)

@@ -138,16 +138,8 @@ int l_convert_ptr2string(lua_State *L)
     return 1;
 }
 
-int main(int argc, char *argv[])
+int luaopen_luikit(lua_State *L)
 {
-    if(argc < 2) {
-        fprintf(stderr, "need file\n");
-        return 1;
-    }
-
-    lua_State *L = luaL_newstate();
-    luaL_openlibs(L);
-
     lua_newtable(L);
 
         lua_pushstring(L, "dlsym");
@@ -182,16 +174,5 @@ int main(int argc, char *argv[])
         lua_pushcfunction(L, l_objc_msgSend);
         lua_settable(L, -3);
 
-    lua_setglobal(L, "C");
-
-    luaL_loadfile(L, argv[1]);
-
-    if(lua_pcall(L, 0, 0, 0) != LUA_OK) {
-        fprintf(stderr, "ERROR: %s\n", lua_tostring(L, 1));
-        return 1;
-    }
-
-
-
-    return 0;
+    return 1;
 }
