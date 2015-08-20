@@ -1,25 +1,18 @@
-#!bin/lua
-
 local L = require 'luikit'
-local C = require 'objc-bindings'
 
 local NS = L.framework("NS", "Foundation")
 local UI = L.framework("UI", "UIKit")
 
-local function str(str)
-    return NS.String{WithUTF8String = str}
-end
+local window = UI.Window()
+window.Frame = {0,0,320,480}
+window.BackgroundColor = UI.Color:blueColor()
 
-local mut = NS.MutableString{WithUTF8String = "lol"}
+window:makeKeyAndVisible()
 
-mut:append{String = str(" wut")}
+local label = UI.Label()
+label.Frame = {20, 20, 280, 40}
+label.BackgroundColor = UI.Color:clearColor()
+label.TextColor = UI.Color:whiteColor()
+label.Text = NS.String{WithUTF8String = "Lua mayn"}
 
-print(C.convert.ptr2string(mut:UTF8String().__id))
-
-
-local view = UI.View()
-view:set{Frame = {0,0,20,20}}
-local method = C.objc.getMethod(view.__id, L.sel_getUid("setFrame:"))
-
-print("types: ", C.objc.getTypesFromMethod(method))
-
+window:add{Subview = label}

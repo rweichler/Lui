@@ -5,4 +5,6 @@
 * Do not use C or Objective C unless you absolutely *have* to. Only reserved for the most low-level bindings.
 * Add easy hooking support for [substitute](http://github.com/comex/substitute) plugins
 
+this is what main.lua outputs right now:
+
 ![](https://github.com/rweichler/LuIKit/raw/master/screen.png)
