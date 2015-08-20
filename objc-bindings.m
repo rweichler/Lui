@@ -25,6 +25,9 @@ int l_call_ptr2string(lua_State *L)
     func_t func = lua_touserdata(L, 1);
 
     const char *result = func(lua_touserdata(L, 2));
+    if(result == NULL) {
+        return 0;
+    }
     lua_pushstring(L, result);
     return 1;
 }
@@ -35,16 +38,17 @@ int l_call_ptr2ptr(lua_State *L)
     func_t func = lua_touserdata(L, 1);
 
     void *result = func(lua_touserdata(L, 2));
+    if(result == NULL) {
+        return 0;
+    }
     lua_pushlightuserdata(L, result);
     return 1;
 }
 
-int l_objc_msgSend(lua_State *L)
+int l_objc_getMethod(lua_State *L)
 {
     id self = lua_touserdata(L, 1);
     SEL _cmd = lua_touserdata(L, 2);
-
-    int arg_count = lua_gettop(L) - 2;
 
     Class class = object_getClass(self);
     BOOL is_meta = class_isMetaClass(class);
@@ -60,6 +64,30 @@ int l_objc_msgSend(lua_State *L)
     if(m == NULL) {
         return 0;
     }
+
+    lua_pushlightuserdata(L, m);
+    return 1;
+}
+
+int l_objc_msgSend(lua_State *L)
+{
+    Method m;
+
+    int results = l_objc_getMethod(L);
+    if(results == 0) {
+        return 0;
+    } else {
+        m = lua_touserdata(L, -results);
+        lua_pop(L, results);
+    }
+
+    id self = lua_touserdata(L, 1);
+    SEL _cmd = lua_touserdata(L, 2);
+
+    Class class = object_getClass(self);
+    BOOL is_meta = class_isMetaClass(class);
+
+    int arg_count = lua_gettop(L) - 2;
 
     const char *typeEncoding = method_getTypeEncoding(m);
 
@@ -138,7 +166,7 @@ int l_convert_ptr2string(lua_State *L)
     return 1;
 }
 
-int luaopen_luikit(lua_State *L)
+int luaopen_bindings(lua_State *L)
 {
     lua_newtable(L);
 
@@ -170,8 +198,16 @@ int luaopen_luikit(lua_State *L)
             lua_settable(L, -3);
         lua_settable(L, -3);
 
-        lua_pushstring(L, "objc_msgSend");
-        lua_pushcfunction(L, l_objc_msgSend);
+        lua_pushstring(L, "objc");
+        lua_newtable(L);
+
+            lua_pushstring(L, "msgSend");
+            lua_pushcfunction(L, l_objc_msgSend);
+            lua_settable(L, -3);
+
+            lua_pushstring(L, "getMethod");
+            lua_pushcfunction(L, l_objc_getMethod);
+            lua_settable(L, -3);
         lua_settable(L, -3);
 
     return 1;

@@ -1,6 +1,7 @@
-BIN=luikit.so
+NAME=objc-bindings
+BIN=$(NAME).so
 
 all: $(BIN)
 
-$(BIN):
-	gcc -o $@ luikit.m -llua -framework Foundation -dynamiclib
+$(BIN): $(NAME).m
+	gcc -o $@ $< -llua -framework Foundation -dynamiclib
