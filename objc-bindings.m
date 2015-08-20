@@ -4,6 +4,8 @@
 #import <stdio.h>
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
+#import <CoreGraphics/CoreGraphics.h>
+
 
 int l_call_string2ptr(lua_State *L)
 {
@@ -89,6 +91,8 @@ int l_objc_getTypesFromMethod(lua_State *L)
     return 1 + count;
 }
 
+void *_fixed = NULL;//TERRIBLE HACK
+
 int l_objc_msgSend(lua_State *L)
 {
     Method m;
@@ -136,9 +140,12 @@ int l_objc_msgSend(lua_State *L)
         break;
         case LUA_TUSERDATA:
         case LUA_TLIGHTUSERDATA:
-            arg = malloc(sizeof(id));
-            *((void **)arg) = lua_touserdata(L, lua_pos);
-            //NSLog(@"yo %@", (id)arg);
+            arg = lua_touserdata(L, lua_pos);
+            if(_fixed != arg) {
+                arg = malloc(sizeof(id));
+                *((void **)arg) = lua_touserdata(L, lua_pos);
+                //NSLog(@"yo %@", (id)arg);
+            }
         break;
         case LUA_TSTRING:
             arg = malloc(sizeof(const char *));
@@ -202,6 +209,35 @@ int l_convert_ptr2string(lua_State *L)
     return 1;
 }
 
+int l_type_fix(lua_State *L)
+{
+    int type = lua_tointeger(L, 1);
+    void *ptr;
+
+    if(type == 0) { //CGRect
+        CGRect rect = CGRectMake(lua_tonumber(L, 2),
+                                 lua_tonumber(L, 3),
+                                 lua_tonumber(L, 4),
+                                 lua_tonumber(L, 5)
+                                );
+
+        ptr = malloc(sizeof(CGRect));
+        *((CGRect *)ptr) = rect;
+    } else if(type == 1) { //idk
+    }
+
+    _fixed = ptr;
+
+    lua_pushlightuserdata(L, ptr);
+
+    return 1;
+}
+
+const char *custom_types[] = {
+    "CGRect",
+    NULL
+};
+
 int luaopen_bindings(lua_State *L)
 {
     lua_newtable(L);
@@ -254,5 +290,19 @@ int luaopen_bindings(lua_State *L)
             lua_settable(L, -3);
         lua_settable(L, -3);
 
+        lua_pushstring(L, "type");
+        lua_newtable(L);
+
+            for(int i = 0; custom_types[i] != NULL; i++) {
+                lua_pushstring(L, custom_types[i]);
+                lua_pushinteger(L, i);
+                lua_settable(L, -3);
+            }
+
+            lua_pushstring(L, "fix");
+            lua_pushcfunction(L, l_type_fix);
+            lua_settable(L, -3);
+
+        lua_settable(L, -3);
     return 1;
 }

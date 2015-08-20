@@ -16,6 +16,49 @@ local R = {}
 
 R.sel_getUid = sel_getUid
 
+
+local lookup_table = {}
+lookup_table['{CGRect={CGPoint=dd}{CGSize=dd}}'] = function(arg)
+    local x, y, width, height
+
+    local indexed = arg[1] ~= nil
+    if indexed then
+        if type(arg[1]) == "table" then
+            x = arg[1][1]
+            y = arg[1][2]
+            width = arg[2][1]
+            height = arg[2][2]
+        elseif type(arg[1]) == "number" or type(arg[1]) == "integer" then
+            x = arg[1]
+            y = arg[2]
+            width = arg[3]
+            height = arg[4]
+        end
+    else
+        x = arg.x
+        y = arg.y
+        width = arg.width
+        height = arg.height
+    end
+
+
+    if not (x and y and width and height) then
+        return error("malformed CGRect")
+    end
+    return C.type.CGRect, x, y, width, height
+end
+
+local function fix_args(args, method)
+    local types = table.pack(C.objc.getTypesFromMethod(method))
+    for i, v in ipairs(args) do
+        local t = types[i + 1]
+        local func = lookup_table[t]
+        if func then
+            args[i] = C.type.fix(func(v))
+        end
+    end
+end
+local id_newindex
 local function id_index(self, key)
     local result = {}
     setmetatable(result, {
@@ -24,7 +67,7 @@ local function id_index(self, key)
             if type(tbl) == "table" then
                 for k,v in pairs(tbl) do
                     newargs[2] = newargs[2]..k..":"
-                    if type(v) == "table" and v.__id ~= nil then
+                    if type(v) == "table" and v.__id then
                         table.insert(newargs, v.__id)
                     else
                         table.insert(newargs, v)
@@ -32,11 +75,14 @@ local function id_index(self, key)
                 end
             end
             newargs[2] = sel_getUid(newargs[2])
-            if C.objc.getMethod(newargs[1], newargs[2]) then
+            local method = C.objc.getMethod(newargs[1], newargs[2])
+            if method then
+                fix_args(newargs, method)
                 local result = {}
                 result.__id = objc_msgSend(table.unpack(newargs))
                 setmetatable(result, {
-                    __index = id_index
+                    __index = id_index,
+                    __newindex = id_newindex
                 })
                 return result
             else
@@ -47,6 +93,20 @@ local function id_index(self, key)
     return result
 end
 
+id_newindex = function(self, key, value)
+    local id = self.__id
+    local sel = sel_getUid("set"..key..":")
+    local method = C.objc.getMethod(id, sel)
+    if not method then
+        return rawset(self, key, value)
+    end
+
+    local tbl = {}
+    tbl[key] = value
+
+    return self:set(tbl)
+end
+
 R.class = function(classname)
     local self = {}
     self.__id = objc_getClass(classname)
@@ -55,6 +115,7 @@ R.class = function(classname)
     end
     setmetatable(self, {
         __index = id_index,
+        __newindex = id_newindex,
         __call = function(_, arg)
             return self:alloc():init(arg)
         end

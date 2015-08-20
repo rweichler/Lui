@@ -4,7 +4,7 @@ local L = require 'luikit'
 local C = require 'objc-bindings'
 
 local NS = L.framework("NS", "Foundation")
---local UI = L.framework("UI", "UIKit")
+local UI = L.framework("UI", "UIKit")
 
 local function str(str)
     return NS.String{WithUTF8String = str}
@@ -17,7 +17,9 @@ mut:append{String = str(" wut")}
 print(C.convert.ptr2string(mut:UTF8String().__id))
 
 
-local method = C.objc.getMethod(NS.String.__id, L.sel_getUid("alloc"))
+local view = UI.View()
+view:set{Frame = {0,0,20,20}}
+local method = C.objc.getMethod(view.__id, L.sel_getUid("setFrame:"))
 
 print("types: ", C.objc.getTypesFromMethod(method))
 
