@@ -93,6 +93,8 @@ local function id_index(self, key)
             local method = C.objc.getMethod(id, sel_getUid(sel))
             if method then
                 return self[sel](self)
+            else
+                return error("method '"..sel.."' not found")
             end
         end
     end
