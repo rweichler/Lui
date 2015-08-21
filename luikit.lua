@@ -18,6 +18,11 @@ R.sel_getUid = sel_getUid
 R.C = C
 R.make_func = make_func
 
+local function is_objc_field(key)
+    local first_char = string.sub(key, 1, 1)
+    return string.upper(first_char) == first_char
+end
+
 
 local lookup_table = {}
 lookup_table['{CGRect={CGPoint=dd}{CGSize=dd}}'] = function(arg)
@@ -85,17 +90,14 @@ end
 
 local id_newindex
 local function id_index(self, key)
-    do
-        local first_char = string.sub(key, 1, 1)
-        if string.upper(first_char) == first_char then
-            local id = self.__id
-            local sel = string.lower(first_char)..string.sub(key, 2, #key)
-            local method = C.objc.getMethod(id, sel_getUid(sel))
-            if method then
-                return self[sel](self)
-            else
-                return error("method '"..sel.."' not found")
-            end
+    if is_objc_field(key) then
+        local id = self.__id
+        local sel = string.lower(string.sub(key, 1, 1))..string.sub(key, 2, #key)
+        local method = C.objc.getMethod(id, sel_getUid(sel))
+        if method then
+            return self[sel](self)
+        else
+            return error("method '"..sel.."' not found")
         end
     end
 
@@ -134,8 +136,7 @@ local function id_index(self, key)
 end
 
 id_newindex = function(self, key, value)
-    local first_char = string.sub(key, 1, 1)
-    if string.upper(first_char) == first_char then
+    if is_objc_field(key) then
         local tbl = {}
         tbl[key] = value
         return self:set(tbl)
@@ -188,8 +189,7 @@ end
 R.init = function(env)
     setmetatable(env, {
         __index = function(self, key)
-            local first_char = string.sub(key, 1, 1)
-            if string.upper(first_char) == first_char then
+            if is_objc_field(key) then
                 return R.class(key)
             end
         end
