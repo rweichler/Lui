@@ -29,7 +29,7 @@ void add_path(lua_State *L, char *buf, const char *cwd, const char *var, const c
     }
 
     strcpy(buf, cwd);
-    strcat(buf, "/?.");
+    strcat(buf, "/lua/?.");
     strcat(buf, ext);
     strcat(buf, ";");
     strcat(buf, path);
@@ -54,8 +54,7 @@ void add_path(lua_State *L, char *buf, const char *cwd, const char *var, const c
     add_path(L, buf, cwd, "cpath", "dylib");
 
     strcpy(buf, cwd);
-    strcat(buf, "/");
-    strcat(buf, "main.lua");
+    strcat(buf, "/lua/main.lua");
     int result = luaL_loadfile(L, buf);
     if(result != LUA_OK) {
         NSLog(@"UIDick: fucked up opening the file: %s", lua_tostring(L, -1));

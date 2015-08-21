@@ -15,6 +15,8 @@ local objc_msgSend = C.objc.msgSend
 local R = {}
 
 R.sel_getUid = sel_getUid
+R.C = C
+R.make_func = make_func
 
 
 local lookup_table = {}
@@ -48,18 +50,54 @@ lookup_table['{CGRect={CGPoint=dd}{CGSize=dd}}'] = function(arg)
     return C.type.CGRect, x, y, width, height
 end
 
+
+local function lua_to_C(arg, typ)
+    local func = lookup_table[typ]
+    if func then
+        return C.type.fix(func(arg))
+    end
+end
+
 local function fix_args(args, method)
     local types = table.pack(C.objc.getTypesFromMethod(method))
     for i, v in ipairs(args) do
-        local t = types[i + 1]
-        local func = lookup_table[t]
-        if func then
-            args[i] = C.type.fix(func(v))
+        local fixed = lua_to_C(v, types[i + 1])
+        if fixed then
+            args[i] = fixed
         end
     end
 end
+
+local function C_to_lua(arg, typ)
+    return nil
+end
+
+local function fix_ret(ret, method)
+    local typ = C.objc.getTypesFromMethod(method)
+
+    local fixed = C_to_lua(ret, typ)
+    if fixed then
+        return fixed
+    else
+        return ret
+    end
+end
+
 local id_newindex
 local function id_index(self, key)
+    do
+        local first_char = string.sub(key, 1, 1)
+        if string.upper(first_char) == first_char then
+            local id = self.__id
+            local sel = string.lower(first_char)..string.sub(key, 2, #key)
+            local method = C.objc.getMethod(id, sel_getUid(sel))
+            if method then
+                return self[sel](self)
+            end
+        end
+    end
+
+
     local result = {}
     setmetatable(result, {
         __call = function(self, obj, tbl)
