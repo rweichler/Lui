@@ -23,11 +23,6 @@ void add_path(lua_State *L, char *buf, const char *cwd, const char *var, const c
     const char *path = lua_tostring(L, -1);
     lua_pop(L, 1); //package{}
 
-    if(buf == NULL) {
-        char buf2[SIZ];
-        buf = buf2;
-    }
-
     strcpy(buf, cwd);
     strcat(buf, "/lua/?.");
     strcat(buf, ext);
