@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
 #define SIZ 4096
 
-void add_path(lua_State *L, char *buf, const char *cwd, const char *var)
+void add_path(lua_State *L, char *buf, const char *cwd, const char *var, const char *ext)
 {
     lua_getglobal(L, "package"); //package{}
 
@@ -29,7 +29,8 @@ void add_path(lua_State *L, char *buf, const char *cwd, const char *var)
     }
 
     strcpy(buf, cwd);
-    strcat(buf, "/?*");
+    strcat(buf, "/?.");
+    strcat(buf, ext);
     strcat(buf, ";");
     strcat(buf, path);
 
@@ -49,8 +50,8 @@ void add_path(lua_State *L, char *buf, const char *cwd, const char *var)
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
     
-    add_path(L, buf, cwd, "path");
-    add_path(L, buf, cwd, "cpath");
+    add_path(L, buf, cwd, "path", "lua");
+    add_path(L, buf, cwd, "cpath", "dylib");
 
     strcpy(buf, cwd);
     strcat(buf, "/");
