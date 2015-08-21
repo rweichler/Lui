@@ -16,3 +16,6 @@ label.TextColor = UI.Color:whiteColor()
 label.Text = NS.String{WithUTF8String = "Lua mayn"}
 
 window:add{Subview = label}
+
+--print out the errors on the iPhone
+----live code updating

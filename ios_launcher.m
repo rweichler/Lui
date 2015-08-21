@@ -11,18 +11,51 @@ int main(int argc, char *argv[])
     return UIApplicationMain(argc, argv, nil, NSStringFromClass(LUIAppDelegate.class));
 }
 
+#define SIZ 4096
+
+void add_path(lua_State *L, char *buf, const char *cwd, const char *var)
+{
+    lua_getglobal(L, "package"); //package{}
+
+    lua_pushstring(L, var);
+    lua_gettable(L, -2); //package{}, path""
+
+    const char *path = lua_tostring(L, -1);
+    lua_pop(L, 1); //package{}
+
+    if(buf == NULL) {
+        char buf2[SIZ];
+        buf = buf2;
+    }
+
+    strcpy(buf, cwd);
+    strcat(buf, "/?*");
+    strcat(buf, ";");
+    strcat(buf, path);
+
+    lua_pushstring(L, var);
+    lua_pushstring(L, buf);
+    lua_settable(L, -3);
+
+    lua_pop(L, 1);
+}
+
 @implementation LUIAppDelegate
 -(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-
-    char cwd[BUFSIZ];
-    getcwd(cwd, BUFSIZ);
-    NSLog(@"UIDick: cwd: %s", cwd);
+    char buf[SIZ];
+    const char *cwd = NSBundle.mainBundle.bundlePath.UTF8String;
 
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
+    
+    add_path(L, buf, cwd, "path");
+    add_path(L, buf, cwd, "cpath");
 
-    int result = luaL_loadfile(L, "Applications/Test.app/main.lua");
+    strcpy(buf, cwd);
+    strcat(buf, "/");
+    strcat(buf, "main.lua");
+    int result = luaL_loadfile(L, buf);
     if(result != LUA_OK) {
         NSLog(@"UIDick: fucked up opening the file: %s", lua_tostring(L, -1));
         return false;

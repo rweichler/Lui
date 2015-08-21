@@ -7,4 +7,8 @@
 
 this is what main.lua outputs right now:
 
-![](https://github.com/rweichler/LuIKit/raw/master/screen.png)
+<img src="https://github.com/rweichler/LuIKit/raw/master/screen.png" width="200"/>
+
+# License
+
+GNU GPL
