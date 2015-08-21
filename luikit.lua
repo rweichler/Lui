@@ -134,17 +134,14 @@ local function id_index(self, key)
 end
 
 id_newindex = function(self, key, value)
-    local id = self.__id
-    local sel = sel_getUid("set"..key..":")
-    local method = C.objc.getMethod(id, sel)
-    if not method then
-        return rawset(self, key, value)
+    local first_char = string.sub(key, 1, 1)
+    if string.upper(first_char) == first_char then
+        local tbl = {}
+        tbl[key] = value
+        return self:set(tbl)
     end
 
-    local tbl = {}
-    tbl[key] = value
-
-    return self:set(tbl)
+    return rawset(self, key, value)
 end
 
 R.class = function(classname)
