@@ -57,28 +57,17 @@ void add_path(lua_State *L, char *buf, const char *cwd, const char *var, const c
     strcat(buf, "/lua/main.lua");
     int result = luaL_loadfile(L, buf);
     if(result != LUA_OK) {
-        NSLog(@"UIDick: fucked up opening the file: %s", lua_tostring(L, -1));
+        NSLog(@"fucked up opening the file: %s", lua_tostring(L, -1));
         return false;
     }
 
     result = lua_pcall(L, 0, 0, 0);
 
     if(result != LUA_OK) {
-        NSLog(@"UIDick: fuckde up calling the file: %s", lua_tostring(L, -1));
+        NSLog(@"fuckde up calling the file: %s", lua_tostring(L, -1));
     }
 
     return true;
 
-}
-@end
-
-
-@interface UIDick : NSObject
-@end
-
-@implementation UIDick
--(void)lolRect:(CGRect)rect
-{
-    NSLog(@"UIDick: %@", NSStringFromCGRect(rect));
 }
 @end
