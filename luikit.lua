@@ -148,7 +148,7 @@ R.class = function(classname)
     local self = {}
     self.__id = objc_getClass(classname)
     if self.__id == nil then
-        return nil
+        return error("class '"..classname.."' not found")
     end
     setmetatable(self, {
         __index = id_index,
@@ -183,6 +183,17 @@ R.framework = function(prefix, dylib)
         end
     })
     return result
+end
+
+R.init = function(env)
+    setmetatable(env, {
+        __index = function(self, key)
+            local first_char = string.sub(key, 1, 1)
+            if string.upper(first_char) == first_char then
+                return R.class(key)
+            end
+        end
+    })
 end
 
 return R

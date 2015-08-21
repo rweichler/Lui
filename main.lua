@@ -1,21 +1,20 @@
 local L = require 'luikit'
 
-local NS = L.framework("NS", "Foundation")
-local UI = L.framework("UI", "UIKit")
+L.init(_ENV)
 
 local NSLog = L.make_func(L.C.dlsym("NSLog"), L.C.call.ptr2ptr)
 
-local window = UI.Window()
+local window = UIWindow()
 window.Frame = {0,0,320,480}
-window.BackgroundColor = UI.Color.BlueColor
+window.BackgroundColor = UIColor.BlueColor
 
 window:makeKeyAndVisible()
 
-local label = UI.Label()
-label.Frame = {20, 20, 280, 40}
-label.BackgroundColor = UI.Color.RedColor
-label.TextColor = UI.Color.WhiteColor
-label.Text = NS.String{WithUTF8String = "Lua mayn"}
+local label = UILabel()
+label.Frame = {0, 20, 320, 40}
+label.BackgroundColor = UIColor.RedColor
+label.TextColor = UIColor.WhiteColor
+label.Text = NSString{WithUTF8String = tostring(getmetatable(_ENV))}
 
 window:add{Subview = label}
 
