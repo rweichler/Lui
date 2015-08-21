@@ -126,7 +126,7 @@ local function id_index(self, key)
                 })
                 return result
             else
-                return error("method "..sel_getName(newargs[2]).."not found")
+                return error("method '"..sel_getName(newargs[2]).."' not found")
             end
         end
     })
