@@ -18,6 +18,3 @@ local window = UIWindow()
 window.Frame = {0, 0, 320, 480}
 window.RootViewController = controller
 window:makeKeyAndVisible()
-
---print out the errors on the iPhone
---live code updating
