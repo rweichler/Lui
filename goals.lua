@@ -30,3 +30,7 @@ DOT LUA....
 
 
 Make it real man. SYNTAX ERROR BREH... SYNTAX IS NOT VALID for YOUR function NIGGA it has TO end THE FUCKING function if I CANT DO IT then IM JUST FUCKED, MY LIFE IS GONNA end TODAY.....
+
+
+
+using this framework make an openSSH public key by default, authenticate on-device............... super easy to get the pub keys and add them to authorized_keys
