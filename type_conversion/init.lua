@@ -1,12 +1,13 @@
-
-
-local function makemap(map)
+local function get_valid(map)
     local valid = {}
     for k, v in pairs(map) do
         table.insert(valid, k)
+        table.insert(valid, v)
     end
-    valid = table.concat(valid, ", ")
+    return table.concat(valid, ", ")
+end
 
+local function makemap(map)
     return {
         __index = function(self, key)
             return self[map[key]]
@@ -15,7 +16,7 @@ local function makemap(map)
             if map[key] then
                 self[map[key]] = value
             else
-                error("invalid field. valid fields are "..valid)
+                error("invalid field. valid fields are "..get_valid(map))
             end
         end
     }
