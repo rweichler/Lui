@@ -1,5 +1,5 @@
 #include <lua/lua.h>
-#include <CoreGraphics/CoreGraphics.h>
+#include <CoreGraphics/CGGeometry.h>
 
 const char *NAME = "CGRect";
 
@@ -15,17 +15,23 @@ int lua_to_c(lua_State *L)
     return 1;
 }
 
+static int set_thishit(lua_State *L, CGFloat *val)
+{
+    CGRect *ptr = lua_touserdata(L, 1);
+    if(lua_gettop(L) == 1) { //get
+        lua_pushnumber(L, *val);
+        return 1;
+    } else { //set
+        *val = lua_tonumber(L, 2);
+        return 0;
+    }
+}
+
 #define FUNC(ORIGIN, X)                         \
 static int get_##X(lua_State *L)                \
 {                                               \
     CGRect *ptr = lua_touserdata(L, 1);         \
-    if(lua_gettop(L) == 1) { /* get */          \
-        lua_pushnumber(L, ptr->ORIGIN.X);       \
-        return 1;                               \
-    } else {                 /* set */          \
-        ptr->ORIGIN.X = lua_tonumber(L, 2);     \
-        return 0;                               \
-    }                                           \
+    return set_thishit(L, &(ptr->ORIGIN.X));    \
 }
 
 FUNC(origin, x);
@@ -48,5 +54,5 @@ int c_to_lua(lua_State *L)
 
 int register_metatable(lua_State *L)
 {
-    
+    return 0;
 }
