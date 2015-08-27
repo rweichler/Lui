@@ -18,12 +18,15 @@ int lua_to_c(lua_State *L)
 static int set_thishit(lua_State *L, CGFloat *val)
 {
     CGRect *ptr = lua_touserdata(L, 1);
-    if(lua_gettop(L) == 1) { //get
-        lua_pushnumber(L, *val);
-        return 1;
-    } else { //set
-        *val = lua_tonumber(L, 2);
-        return 0;
+    switch(lua_gettop(L)) {
+        case 1: //get
+            lua_pushnumber(L, *val);
+            return 1;
+        case 2: //set
+            *val = lua_tonumber(L, 2);
+            return 0;
+        default:
+            return luaL_error("invalid # of arguments (expected 1 or 2)");
     }
 }
 
