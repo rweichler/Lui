@@ -71,6 +71,20 @@ int l_objc_getMethod(lua_State *L)
     return 1;
 }
 
+int l_objc_getReturnTypeFromMethod(lua_State *L)
+{
+    if(lua_gettop(L) == 0 || !lua_islightuserdata(L, 1)) {
+        return luaL_error(L, "invalid arguments");
+    }
+
+    Method m = lua_touserdata(L, 1);
+    char ret[BUFSIZ];
+    method_getReturnType(m, ret, BUFSIZ);
+    lua_pushstring(L, ret);
+
+    return 1;
+}
+
 int l_objc_getTypesFromMethod(lua_State *L)
 {
     if(lua_gettop(L) == 0 || !lua_islightuserdata(L, 1)) {
